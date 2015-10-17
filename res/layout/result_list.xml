@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 结果信息列表显示样式 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    android:background="@drawable/antispam_report_button"
+    android:orientation="vertical" >
+
+    <!-- 标题 -->
+
+    <RelativeLayout
+        android:id="@+id/result_title_rl"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@drawable/lieche" >
+
+        <TextView
+            android:id="@+id/result_title_tv"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:layout_alignParentBottom="true"
+            android:background="#99000000"
+            android:padding="5dp"
+            android:text="亲，已帮您找到列车信息"
+            android:textColor="@android:color/white" />
+    </RelativeLayout>
+    <!-- 内容列表 -->
+
+    <LinearLayout
+        android:id="@+id/result_item_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+    </LinearLayout>
+
+</LinearLayout>
