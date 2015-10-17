@@ -1,6 +1,5 @@
 package com.example.robot;
 
-
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -24,7 +23,7 @@ import android.widget.ProgressBar;
 public class DetailActivity extends Activity
 {
 	public static final String	DETAIL	= "detailUrl";
-	private static final String	TAG	= "DetailActivity";
+	private static final String	TAG		= "DetailActivity";
 	private WebView				mWebView;
 	private WebSettings			mSettings;
 	private ProgressBar			mPbLoading;
@@ -44,12 +43,24 @@ public class DetailActivity extends Activity
 		String data = intent.getStringExtra(DETAIL);
 
 		mSettings = mWebView.getSettings();
+		// 设置js可以直接打开窗口，如window.open()，默认为false
+		mSettings.setJavaScriptCanOpenWindowsAutomatically(true);
 		// 设置js可用
 		mSettings.setJavaScriptEnabled(true);
+		// 是否可以缩放，默认true
+		mSettings.setSupportZoom(true);
 		// 显示 放大缩小按钮
 		mSettings.setBuiltInZoomControls(true);
-		// 设置 双击放大缩小
+		// 设置此属性，可任意比例缩放。大视图模式
 		mSettings.setUseWideViewPort(true);
+		// 和setUseWideViewPort(true)一起解决网页自适应问题
+		mSettings.setLoadWithOverviewMode(true);
+		// 是否使用缓存 ,缓存不开启的时候，可能会有一些使用了这些存储的网页无法打开。
+		mSettings.setAppCacheEnabled(true);
+		// DOM Storage
+		mSettings.setDomStorageEnabled(true);
+		// 设置用户代理，一般不用
+		// displayWebview.getSettings().setUserAgentString("User-Agent:Android");
 
 		// 设置客户端，可以利用一些回调进行操作
 		mWebView.setWebViewClient(new WebViewClient() {
@@ -86,8 +97,9 @@ public class DetailActivity extends Activity
 			}
 		});
 		// 加载网页
-		Log.d(TAG, data);   // &searchDep=%E5%AE%89%E5%BA%86%E8%A5%BF&searchArr=%E5%B9%BF%E5%B7%9E%E4%B8%9C&startCity=%E5%AE%89%E5%BA%86&endCity=%E5%B9%BF%E5%B7%9E
-		//data = "http://touch.qunar.com/h5/train/trainOrderFillOpt?startStation=安庆西&endStation=广州东&searchType=stasta&trainNum=K311/K310&date=2015-10-07&sort=3&seatType=*";
+		Log.d(TAG, data); // &searchDep=%E5%AE%89%E5%BA%86%E8%A5%BF&searchArr=%E5%B9%BF%E5%B7%9E%E4%B8%9C&startCity=%E5%AE%89%E5%BA%86&endCity=%E5%B9%BF%E5%B7%9E
+		// data =
+		// "http://touch.qunar.com/h5/train/trainOrderFillOpt?startStation=安庆西&endStation=广州东&searchType=stasta&trainNum=K311/K310&date=2015-10-07&sort=3&seatType=*";
 		mWebView.loadUrl(data);
 	}
 }
