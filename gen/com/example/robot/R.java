@@ -43,27 +43,29 @@ public final class R {
         public static final int yu=0x7f020013;
     }
     public static final class id {
-        public static final int action_settings=0x7f080014;
-        public static final int answer_container=0x7f080007;
-        public static final int answer_iv_pic=0x7f080009;
-        public static final int answer_tv_content=0x7f080008;
-        public static final int ask_container=0x7f080005;
-        public static final int ask_tv_content=0x7f080006;
-        public static final int bt=0x7f080003;
-        public static final int btn_container=0x7f080002;
-        public static final int list_icon_iv=0x7f080013;
-        public static final int list_name_tv=0x7f080011;
-        public static final int list_time_tv=0x7f080012;
-        public static final int lv=0x7f080004;
-        public static final int pb_loading=0x7f080001;
-        public static final int result_item_container=0x7f080010;
-        public static final int result_item_downtitle_tv=0x7f08000c;
-        public static final int result_item_icon_iv=0x7f08000d;
-        public static final int result_item_uptitle_tv=0x7f08000b;
-        public static final int result_list_container=0x7f08000a;
-        public static final int result_title_rl=0x7f08000e;
-        public static final int result_title_tv=0x7f08000f;
-        public static final int wv_detail=0x7f080000;
+        public static final int action_settings=0x7f080016;
+        public static final int answer_container=0x7f080008;
+        public static final int answer_iv_pic=0x7f08000a;
+        public static final int answer_tv_content=0x7f080009;
+        public static final int ask_container=0x7f080006;
+        public static final int ask_tv_content=0x7f080007;
+        public static final int bt=0x7f080004;
+        public static final int btn_container=0x7f080003;
+        public static final int list_icon_iv=0x7f080014;
+        public static final int list_name_tv=0x7f080012;
+        public static final int list_time_tv=0x7f080013;
+        public static final int lv=0x7f080005;
+        public static final int pb_loading=0x7f080002;
+        public static final int progress_indicator=0x7f080015;
+        public static final int result_item_container=0x7f080011;
+        public static final int result_item_downtitle_tv=0x7f08000d;
+        public static final int result_item_icon_iv=0x7f08000e;
+        public static final int result_item_uptitle_tv=0x7f08000c;
+        public static final int result_list_container=0x7f08000b;
+        public static final int result_title_rl=0x7f08000f;
+        public static final int result_title_tv=0x7f080010;
+        public static final int video_view=0x7f080000;
+        public static final int wv_detail=0x7f080001;
     }
     public static final class layout {
         public static final int activity_detail=0x7f030000;
@@ -72,6 +74,7 @@ public final class R {
         public static final int result_item=0x7f030003;
         public static final int result_list=0x7f030004;
         public static final int trains_list=0x7f030005;
+        public static final int video_loading_progress=0x7f030006;
     }
     public static final class menu {
         public static final int main=0x7f070000;

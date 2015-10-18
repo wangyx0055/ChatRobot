@@ -39,7 +39,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.example.robot.DetailActivity"></activity>
+        <!-- hardwareAccelerated是用来保证视频能播放 -->
+        <activity
+            android:name="com.example.robot.DetailActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:hardwareAccelerated="true" >
+        </activity>
     </application>
 
 </manifest>

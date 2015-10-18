@@ -3,7 +3,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-
     android:background="@drawable/antispam_report_button"
     android:orientation="vertical" >
 
@@ -13,7 +12,10 @@
         android:id="@+id/result_title_rl"
         android:layout_width="match_parent"
         android:layout_height="80dp"
-        android:background="@drawable/lieche" >
+        android:background="@drawable/lieche"
+        
+        android:padding="7dp"
+         >
 
         <TextView
             android:id="@+id/result_title_tv"
@@ -23,6 +25,7 @@
             android:background="#99000000"
             android:padding="5dp"
             android:text="亲，已帮您找到列车信息"
+            android:textSize="15sp"
             android:textColor="@android:color/white" />
     </RelativeLayout>
     <!-- 内容列表 -->
