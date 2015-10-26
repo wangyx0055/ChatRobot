@@ -11,12 +11,24 @@
         android:id="@+id/ask_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"  >
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp" >
+
+        <!-- 我的头像 -->
+
+        <ImageView
+            android:id="@+id/ask_iv_myface"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/xiaoxin" />
 
         <RelativeLayout
-            android:layout_width="260dp"
+            android:layout_toLeftOf="@id/ask_iv_myface"
+            android:layout_width="240dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true" >
+            android:layout_marginRight="5dp" >
 
             <TextView
                 android:id="@+id/ask_tv_content"
@@ -34,33 +46,41 @@
 
     <LinearLayout
         android:id="@+id/answer_container"
-        android:layout_width="260dp"
+        android:layout_width="280dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp" 
-        android:orientation="vertical" >
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="10dp"
+        android:orientation="horizontal" >
+
+        <!-- 机器人头像 -->
+
+        <ImageView
+            android:id="@+id/answer_iv_chatface"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/xiaoxin" />
 
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/answer_bubble"
-             >
+            android:layout_marginLeft="5dp"
+            android:background="@drawable/answer_bubble" >
 
             <TextView
-                android:layout_centerVertical="true"
                 android:id="@+id/answer_tv_content"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
                 android:text="答"
                 android:textColor="#000000" />
 
             <ImageView
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"
                 android:id="@+id/answer_iv_pic"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:scaleType="centerCrop"
-				 />
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:scaleType="centerCrop" />
         </RelativeLayout>
     </LinearLayout>
 
@@ -72,51 +92,8 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="10dp"
-        android:background="@android:color/white"
-         >
+        android:layout_marginRight="16dp"        
+        android:background="@android:color/white" >
     </FrameLayout>
-
-    <!--
-    <LinearLayout
-        android:id="@+id/train_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        
-        android:background="@drawable/antispam_report_button"
-        android:orientation="vertical" >
-
-        标题
-
-        <RelativeLayout
-            android:id="@+id/train_title"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:background="@drawable/lieche" >
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="25dp"
-                android:layout_alignParentBottom="true"
-                android:background="#99000000"
-                android:padding="5dp"
-                android:text="亲，已帮您找到列车信息"
-                android:textColor="@android:color/white" />
-        </RelativeLayout>
-        内容列表
-
-        <LinearLayout
-            android:id="@+id/train_list_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" >
-        </LinearLayout>
-    </LinearLayout>
-    -->
 
 </LinearLayout>

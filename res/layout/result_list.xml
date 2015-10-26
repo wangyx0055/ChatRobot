@@ -8,26 +8,34 @@
 
     <!-- 标题 -->
 
-    <RelativeLayout
-        android:id="@+id/result_title_rl"
+    <FrameLayout        
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:background="@drawable/lieche"
-        
-        android:padding="7dp"
-         >
+        android:layout_height="wrap_content"
+        android:padding="8dp" >
 
-        <TextView
-            android:id="@+id/result_title_tv"
+        <RelativeLayout
+            android:id="@+id/result_title_rl"
             android:layout_width="match_parent"
-            android:layout_height="25dp"
-            android:layout_alignParentBottom="true"
-            android:background="#99000000"
-            android:padding="5dp"
-            android:text="亲，已帮您找到列车信息"
-            android:textSize="15sp"
-            android:textColor="@android:color/white" />
-    </RelativeLayout>
+            android:layout_height="100dp"
+            android:background="@drawable/lieche" >
+
+            <TextView
+                android:id="@+id/result_title_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:background="#99000000"
+                android:padding="5dp"
+                android:text="亲，已帮您找到列车信息"
+                android:textColor="@android:color/white"
+                android:textSize="17sp" />
+        </RelativeLayout>
+    </FrameLayout>
+    <!-- 分割线 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0.6dp"
+        android:background="#22000000" />
     <!-- 内容列表 -->
 
     <LinearLayout

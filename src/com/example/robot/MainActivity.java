@@ -7,15 +7,25 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.robot.JsonItem.CWBean;
 import com.example.robot.JsonItem.WSBean;
@@ -28,6 +38,7 @@ import com.example.robot.bean.TrainBean;
 import com.example.robot.bean.TrainBean.TrainListBean;
 import com.example.robot.controller.ResultItemController;
 import com.example.robot.controller.ResultListController;
+import com.example.robot.utils.PreferenceUtils;
 import com.google.gson.Gson;
 import com.iflytek.cloud.RecognizerResult;
 import com.iflytek.cloud.SpeechError;
@@ -49,11 +60,14 @@ public class MainActivity extends Activity
 {
 
 	protected static final String	TAG		= "MainActivity";
+	protected static final int	REQUESTCODE_CHAT_OR_MYFACE	= 100;
 	private ListView				mLv;
 	private SpeakUtils				mUtils;
 	private List<ConversationBean>	mDatas	= new ArrayList<ConversationBean>();
 	private MyAdapter				mMyAdapter;
 	private String mDetailUrl;
+	private long	mLastBackKeyTime = 0;
+	private long	mLatestBackKeyTime;
 	
 
 	@Override
@@ -82,12 +96,104 @@ public class MainActivity extends Activity
 																							.build();
 		// 初始化ImageLoader
 		ImageLoader.getInstance().init(config);
-
+		
+		// 初始化说话工具
 		mUtils = new SpeakUtils(this);		
 		
 		mLv = (ListView) findViewById(R.id.lv);
-		mMyAdapter = new MyAdapter();
+		mMyAdapter = new MyAdapter();		
 		mLv.setAdapter(mMyAdapter);
+		
+		/***************第一行机器人提示******************/
+		ConversationBean bean = new ConversationBean();
+		bean.isAsk = false;
+		bean.answerContent = "亲爱的主人，你好！我是聪明可爱的语音机器人-小新，我可以为你提供很多服务哦，比如陪你聊天、给你讲笑话、讲故事，还能帮你查询你想要的信息，比如查天气、查火车、查航班、查美女、查帅哥，都不在话下。快和我说话吧，亲！";
+		bean.backCode = 100000;
+		bean.askContent = "";
+		
+		// 添加到list中
+		mDatas.add(bean);
+		// UI更新
+		mMyAdapter.notifyDataSetChanged();
+		// 说出来
+		mUtils.speak(bean.answerContent, null);
+	}
+	
+	/**
+	 * 创建菜单
+	 */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+//        MenuItem aboutItem = menu.findItem(R.id.action_about);
+//        aboutItem.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+//			
+//			@Override
+//			public boolean onMenuItemClick(MenuItem item)
+//			{
+//				Intent intent = new Intent(MainActivity.this, AboutActivity.class);		
+//				startActivity(intent);
+//				return true;
+//			}
+//		});
+        return true;
+    }
+    /**
+     * 设置菜单选项的点击事件 
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+    	Intent intent = null;
+    	switch (item.getItemId())
+		{
+			case R.id.action_settings:
+				intent = new Intent(this, SettingActivity.class);		
+				startActivityForResult(intent, REQUESTCODE_CHAT_OR_MYFACE);
+				break;
+			case R.id.action_about:
+				
+				intent = new Intent(this, AboutActivity.class);		
+				startActivity(intent);
+				
+				break;
+			case R.id.action_share:
+				Toast.makeText(this, " 分享菜单被点击了", Toast.LENGTH_SHORT).show();
+				intent = new Intent(this, DetailActivity.class);		
+				intent.putExtra(Constants.DETAILURL, "http://wap.baidu.com");
+				startActivity(intent);
+				
+				break;
+
+			default:
+				break;
+		}    	
+    	return super.onOptionsItemSelected(item);
+    }
+	
+	@Override
+	protected void onPause()
+	{
+		super.onPause();
+		// 当activity 失去焦点时，语音 停止
+		mUtils.stopSpeaking();
+	}
+	
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+		// 当activity 重新拿到焦点时，语音 重新播放
+		mUtils.resumeSpeaking();
+	}
+	
+	@Override
+	protected void onDestroy()
+	{
+		super.onDestroy();
+		// 当activity 销毁时，语音 停止
+		mUtils.stopSpeaking();
 	}
 
 	// 听我们说
@@ -194,9 +300,7 @@ public class MainActivity extends Activity
 											TextBean textBean = gson.fromJson(result, TextBean.class);
 											bean.answerContent = textBean.text;
 											mDetailUrl = textBean.url;
-											bean.answerUrl = textBean.url;						
-											
-											
+											bean.answerUrl = textBean.url;	
 											
 											break;
 										case 302000:
@@ -206,13 +310,7 @@ public class MainActivity extends Activity
 											
 											bean.answerList = newsList;
 											
-											bean.answerContent = newsBean.text;
-											for (int i = 0; i < newsList.size(); i++)
-											{
-												NewsListBean newsListBean = newsList.get(i);
-												String news = newsListBean.article+"\n"+newsListBean.source;
-												bean.answerContent = bean.answerContent+"\n"+news+"\n";
-											}	
+											bean.answerContent = newsBean.text+"，点击可看详情";											
 											
 											bean.answerUrl = newsList.get(0).icon;
 											
@@ -222,16 +320,9 @@ public class MainActivity extends Activity
 											TrainBean trainBean = gson.fromJson(result, TrainBean.class);
 											List<TrainListBean> trainList = trainBean.list;
 											
-											bean.answerList = trainList;
+											bean.answerList = trainList;											
 											
-											
-											bean.answerContent = trainBean.text;
-											for (int i = 0; i < trainList.size(); i++)
-											{
-												TrainListBean trainListBean = trainList.get(i);
-												String trains = trainListBean.start+"-"+trainListBean.terminal+"\n"+trainListBean.trainnum+"\n"+trainListBean.starttime+"-"+trainListBean.endtime;
-												bean.answerContent = bean.answerContent+"\n"+trains+"\n";
-											}	
+											bean.answerContent = trainBean.text+"，点击可看详情";											
 											
 											bean.answerUrl = trainList.get(0).icon;
 											
@@ -240,13 +331,11 @@ public class MainActivity extends Activity
 											// 菜谱类 、视频、小说
 											CaiBean caiBean = gson.fromJson(result, CaiBean.class);
 											List<CaiListBean> caiList = caiBean.list;
-											bean.answerContent = caiBean.text;
-											for (int i = 0; i < caiList.size(); i++)
-											{
-												CaiListBean caiListBean = caiList.get(i);
-												String cais = caiListBean.name+"\n"+caiListBean.info;
-												bean.answerContent = bean.answerContent+"\n"+cais+"\n";
-											}
+											
+											bean.answerList = caiList;
+											
+											bean.answerContent = caiBean.text+"，点击可看详情";
+											
 											bean.answerUrl = caiList.get(0).icon;
 											
 											break;
@@ -265,8 +354,15 @@ public class MainActivity extends Activity
 									mLv.smoothScrollToPosition(mMyAdapter
 																			.getCount());
 
-									// 说出来
-									mUtils.speak(bean.answerContent, null);
+									// 说出来	
+									if(bean.askContent.contains("天气")){
+										// 如果是天气信息，
+										String[] answerSplit = bean.answerContent.split(":");										
+										String weatherInfo = "亲，已帮您找到"+answerSplit[0]+"天气信息，点击可看详情";
+										mUtils.speak(weatherInfo, null);
+									} else {
+										mUtils.speak(bean.answerContent, null);
+									}
 								}
 							});
 
@@ -279,7 +375,7 @@ public class MainActivity extends Activity
 			{
 				error.getPlainDescription(true); // 获取错误码描述
 			}
-		};
+		};	
 
 	private class MyAdapter extends BaseAdapter
 	{
@@ -316,13 +412,25 @@ public class MainActivity extends Activity
 				// 找view
 				holder.askContainer = (ViewGroup) convertView.findViewById(R.id.ask_container);  // 问的内容的气泡
 				holder.answerContainer = (ViewGroup) convertView.findViewById(R.id.answer_container); // 答的内容的气泡
+				// 如果是第一个条目，距顶部距离要 有10dp
+				if(position==0){
+					// 获得当前手机的dpi
+					DisplayMetrics displayMetrics = getResources().getDisplayMetrics();					
+					int dpi = displayMetrics.densityDpi;		
+					
+					LayoutParams params = (LayoutParams) ((LinearLayout)holder.answerContainer).getLayoutParams();
+					// 将10dp转换成像素值 px = dp*(dpi/160)
+					params.topMargin = 10*(dpi/160);
+					((LinearLayout)holder.answerContainer).setLayoutParams(params);
+				}
+				
 				holder.resultListContainer = (ViewGroup) convertView.findViewById(R.id.result_list_container); // 回答的列车类信息整个的容器
 				
 				holder.tvAskContent = (TextView) convertView.findViewById(R.id.ask_tv_content);  // 问的文字内容
 				holder.tvAnswerContent = (TextView) convertView.findViewById(R.id.answer_tv_content); // 答的文字内容
 				
-				//holder.trainListContainer = (ViewGroup) convertView.findViewById(R.id.train_list_container);  // 回答的列车信息列表的容器
-				//holder.trainTitle = (ViewGroup) convertView.findViewById(R.id.train_title);  // 回答的列车信息列表的 标题
+				holder.ivAnswerChatFace = (ImageView) convertView.findViewById(R.id.answer_iv_chatface);  // 回答的机器人头像图片
+				holder.ivAskMyFace = (ImageView) convertView.findViewById(R.id.ask_iv_myface);  // 我的头像图片
 				
 				holder.ivAnswerPic = (ImageView) convertView.findViewById(R.id.answer_iv_pic);  // 回答的图片
 				holder.ivAnswerPic.setOnClickListener(new OnClickListener() {
@@ -354,12 +462,34 @@ public class MainActivity extends Activity
 				holder.answerContainer.setVisibility(View.GONE);
 				holder.resultListContainer.setVisibility(View.GONE);
 
-				holder.tvAskContent.setText(bean.askContent);				
+				holder.tvAskContent.setText(bean.askContent);	
+				
+				// 设置 我的头像				
+				// 先判断是不是系统头像
+				if(PreferenceUtils.getBoolean(MainActivity.this, Constants.MYFACE_IS_SYS,true)){
+					int currentMyFace = PreferenceUtils.getInt(MainActivity.this, Constants.MYFACE, R.drawable.icon60_1);
+					holder.ivAskMyFace.setImageResource(currentMyFace);
+				} else{
+					String myFace_Uri = PreferenceUtils.getString(MainActivity.this, Constants.MYFACE_URI);
+					Bitmap bitmap = BitmapFactory.decodeFile(myFace_Uri);
+					holder.ivAskMyFace.setImageBitmap(bitmap);
+				}				
 			}
 			else
 			{
 				// 如果是答的情况
 				holder.askContainer.setVisibility(View.GONE);
+				
+				// 设置机器人头像				
+				// 先判断是不是系统头像
+				if(PreferenceUtils.getBoolean(MainActivity.this, Constants.CHATFACE_IS_SYS,true)){
+					int currentChatFace = PreferenceUtils.getInt(MainActivity.this, Constants.CHATFACE, R.drawable.icon60_4);
+					holder.ivAnswerChatFace.setImageResource(currentChatFace);
+				} else{
+					String chatFace_Uri = PreferenceUtils.getString(MainActivity.this, Constants.CHATFACE_URI);
+					Bitmap bitmap = BitmapFactory.decodeFile(chatFace_Uri);
+					holder.ivAnswerChatFace.setImageBitmap(bitmap);
+				}
 				
 				ResultListController resultListController = null;				
 				// 根据返回码判断返回信息
@@ -367,8 +497,7 @@ public class MainActivity extends Activity
 				{					
 					case 100000:
 						
-						//文字类 /
-						
+						//文字类 /						
 						// 天气类
 						if(bean.askContent.contains("天气")){
 							// 隐藏 回答气泡
@@ -376,8 +505,11 @@ public class MainActivity extends Activity
 							// "北京:10/15 周四,11-25° 21° 晴 微风小于3级;10/16 周五,12-25° 霾 微风小于3级;10/17 周六,13-23° 小雨 微风小于3级;10/18 周日,11-18° 多云 微风小于3级;"
 							String[] answerSplit = bean.answerContent.split(":");
 							
-							String titleUrl = "https://wap.baidu.com/s?word="+bean.askContent;
-							String titleText = "亲，已帮您找到"+answerSplit[0]+"天气信息";
+							//String titleUrl = "https://wap.baidu.com/s?word="+bean.askContent;
+							//String titleUrl = "http://m.sohu.com/weather/?city=%E7%BA%BD%E7%BA%A6";
+							String titleUrl = "http://m.sohu.com/weather/?city="+answerSplit[0];
+							String titleText = "亲，已帮您找到"+answerSplit[0]+"天气信息，点击可看详情";
+							
 							resultListController = new ResultListController(MainActivity.this, titleUrl, titleText);
 							// 设置标题部分背景图片
 							resultListController.setTitlePic(R.drawable.weather);	
@@ -425,7 +557,9 @@ public class MainActivity extends Activity
 							}							
 							
 							holder.resultListContainer.removeAllViews();
-							holder.resultListContainer.addView(resultListController.getRootView());		
+							holder.resultListContainer.addView(resultListController.getRootView());	
+							// 必须加上，否则有时不出现
+							holder.resultListContainer.setVisibility(View.VISIBLE);
 							
 							
 						} else{					
@@ -467,7 +601,7 @@ public class MainActivity extends Activity
 						List<NewsListBean> answerList = (List<NewsListBean>) bean.answerList;
 						
 						String titleUrl = "http://news.163.com/mobile/?from=index.sitemap";
-						String titleText = bean.answerContent ;
+						String titleText = bean.answerContent;
 						resultListController = new ResultListController(MainActivity.this, titleUrl, titleText);
 						// 设置标题部分背景图片
 						resultListController.setTitlePic(R.drawable.news);
@@ -494,6 +628,8 @@ public class MainActivity extends Activity
 						
 						holder.resultListContainer.removeAllViews();
 						holder.resultListContainer.addView(resultListController.getRootView());	
+						// 必须加上，否则有时不出现
+						holder.resultListContainer.setVisibility(View.VISIBLE);
 						
 						break;
 						
@@ -506,7 +642,7 @@ public class MainActivity extends Activity
 						// 获取 所要查询的 日期
 						String TrainDate = getQueryDate(bean);
 						String titleUrl_train = train0Bean.detailurl+"trainList?startStation="+train0Bean.start+"&endStation="+train0Bean.terminal+"&searchType=stasta&date="+TrainDate;
-						String titleText_train = bean.answerContent ;
+						String titleText_train = bean.answerContent;
 						resultListController = new ResultListController(MainActivity.this, titleUrl_train, titleText_train);
 						
 						/****************** 添加火车信息列表中的条目，并各自添加点击事件*****************/
@@ -531,21 +667,47 @@ public class MainActivity extends Activity
 						}						
 						
 						holder.resultListContainer.removeAllViews();
-						holder.resultListContainer.addView(resultListController.getRootView());	
+						holder.resultListContainer.addView(resultListController.getRootView());
+						// 必须加上，否则有时不出现
+						holder.resultListContainer.setVisibility(View.VISIBLE);
 						
 						break;
 					case 308000:
 						// 菜谱类 、视频、小说
-//						CaiBean caiBean = gson.fromJson(result, CaiBean.class);
-//						List<CaiListBean> caiList = caiBean.list;
-//						bean.answerContent = caiBean.text;
-//						for (int i = 0; i < caiList.size(); i++)
-//						{
-//							CaiListBean caiListBean = caiList.get(i);
-//							String cais = caiListBean.name+"\n"+caiListBean.info;
-//							bean.answerContent = bean.answerContent+"\n"+cais+"\n";
-//						}
-//						bean.answerUrl = caiList.get(0).icon;
+						holder.answerContainer.setVisibility(View.GONE);
+						
+						List<CaiListBean> answerList_cai = (List<CaiListBean>) bean.answerList;
+						
+						String titleUrl_cai = "http://m.xiachufang.com/category";
+						String titleText_cai = bean.answerContent;
+						resultListController = new ResultListController(MainActivity.this, titleUrl_cai, titleText_cai);
+						// 设置标题部分背景图片
+						resultListController.setTitlePic(R.drawable.caipu);
+						
+						/****************** 添加  菜谱 信息列表中的条目，并各自添加点击事件*****************/
+						// 在添加条目之前，把原来的清空，防止重复添加
+						resultListController.getItemContainer().removeAllViews();
+						// 逐个添加条目
+						for (int i = 0; i < answerList_cai.size(); i++)
+						{
+							final CaiListBean caiListBean = answerList_cai.get(i);
+							
+							String itemUrl = caiListBean.detailurl;
+							String upTitleText = caiListBean.name;
+							String downTitleText = caiListBean.info;
+							
+							ResultItemController resultItemController = new ResultItemController(MainActivity.this, itemUrl, upTitleText, downTitleText);
+							// 设置条目右边的图片
+							ImageLoader.getInstance().displayImage(caiListBean.icon, resultItemController.getIconView());					
+							// 将条目view添加进容器
+							View resultItemView = resultItemController.getRootView();							
+							resultListController.getItemContainer().addView(resultItemView);
+						}						
+						
+						holder.resultListContainer.removeAllViews();
+						holder.resultListContainer.addView(resultListController.getRootView());	
+						// 必须加上，否则有时不出现
+						holder.resultListContainer.setVisibility(View.VISIBLE);
 						
 						break;
 
@@ -581,8 +743,10 @@ public class MainActivity extends Activity
 				Log.d(TAG, "uri:"+uri);
 				
 				if(uri!=null){
-					holder.ivAnswerPic.setVisibility(View.VISIBLE);
-					ImageLoader.getInstance().displayImage(uri, holder.ivAnswerPic);					
+					if(uri != bean.answerUrl){
+						holder.ivAnswerPic.setVisibility(View.VISIBLE);
+						ImageLoader.getInstance().displayImage(uri, holder.ivAnswerPic);	
+					}									
 				}
 			}
 
@@ -593,6 +757,7 @@ public class MainActivity extends Activity
 
 	private class ViewHolder
 	{
+		
 		ViewGroup	askContainer;
 		ViewGroup	answerContainer;
 		ViewGroup	resultListContainer;
@@ -600,9 +765,11 @@ public class MainActivity extends Activity
 		TextView	tvAskContent;
 		TextView	tvAnswerContent;
 		ImageView	ivAnswerPic;
+		ImageView	ivAnswerChatFace;
+		ImageView	ivAskMyFace;
 		
-		ViewGroup	trainListContainer;
-		ViewGroup	trainTitle;
+//		ViewGroup	trainListContainer;
+//		ViewGroup	trainTitle;
 
 	}
 	/**
@@ -628,5 +795,53 @@ public class MainActivity extends Activity
 		queryDate = formatter.format(date);	
 		
 		return queryDate;
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data)
+	{
+		
+		if(resultCode == SettingActivity.RESULTCODE_CHAT_OR_MYFACE){
+			
+			switch (requestCode)
+			{
+				case REQUESTCODE_CHAT_OR_MYFACE:
+					// 说明机器人头像  或者 我的头像 改变了,设置聊天界面的头像
+					mMyAdapter.notifyDataSetChanged();
+					Log.d(TAG, "onActivityResult设置聊天界面的头像");
+					
+					break;
+
+				default:
+					break;
+			}
+		}		
+	}
+	/**
+	 * 重写back键
+	 */
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event)
+	{
+
+		if (keyCode == KeyEvent.KEYCODE_BACK)
+		{
+			Log.d(TAG, "back按了");
+			
+			mLatestBackKeyTime = System.currentTimeMillis();
+			// 如果是
+			if (mLatestBackKeyTime - mLastBackKeyTime > 2000)
+			{
+				Toast.makeText(MainActivity.this, "再按一次退出机器人小新", Toast.LENGTH_SHORT).show();
+				mLastBackKeyTime = mLatestBackKeyTime;
+			}			
+			else
+			{
+				// 如果连续点了两次就直接销毁
+				finish();
+			}
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
 	}
 }

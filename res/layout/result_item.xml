@@ -7,18 +7,33 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="7dp" >
+        android:padding="8dp" >
+        
+        <!-- 右边图标 -->
+
+        <ImageView
+            android:id="@+id/result_item_icon_iv"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_launcher" />
 
         <!-- 左边两行文字 -->
 
         <LinearLayout
+            android:layout_toLeftOf="@id/result_item_icon_iv"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:orientation="vertical" >
 
             <TextView
-                android:textSize="15sp"
+                android:textSize="16sp"
                 android:id="@+id/result_item_uptitle_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -26,6 +41,7 @@
                 android:text="北京-石家庄" />
 
             <TextView
+                android:layout_marginTop="3dp"
                 android:textSize="15sp"
                 android:id="@+id/result_item_downtitle_tv"
                 android:layout_width="wrap_content"
@@ -33,15 +49,7 @@
                 android:singleLine="true"
                 android:text="02:37,07:35" />
         </LinearLayout>
-        <!-- 右边图标 -->
-
-        <ImageView
-            android:id="@+id/result_item_icon_iv"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:src="@drawable/ic_launcher" />
+        
     </RelativeLayout>
 
     <TextView

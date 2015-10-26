@@ -2,10 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.robot"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="1.1" >
 
     <uses-sdk
-        android:minSdkVersion="8"
+        android:minSdkVersion="11"
         android:targetSdkVersion="17" />
 
     <!-- 连接网络权限，用于执行云端语音能力 -->
@@ -24,6 +24,8 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <!-- 外存储写入权限，构建语法需要用到此权限 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- 外存储 读取用到此权限 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -44,6 +46,12 @@
             android:name="com.example.robot.DetailActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:hardwareAccelerated="true" >
+        </activity>
+        <activity android:name="com.example.robot.AboutActivity" >
+        </activity>
+        <activity android:name="com.example.robot.SettingActivity" >
+        </activity>
+        <activity android:name="com.example.robot.SysFaceActivity" >
         </activity>
     </application>
 

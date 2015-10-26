@@ -1,5 +1,6 @@
 package com.example.robot;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -44,6 +46,9 @@ public class DetailActivity extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_detail);
+		// 获得actionbar对象
+		ActionBar actionBar = getActionBar();
+		actionBar.setDisplayHomeAsUpEnabled(true);
 
 		// 初始化webview
 		initwidget();
@@ -57,6 +62,25 @@ public class DetailActivity extends Activity
 		mWebView.loadUrl(data);
 
 	}
+	/**
+     * 设置菜单选项的点击事件 
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+    	switch (item.getItemId())
+		{
+			case android.R.id.home:
+				
+				this.finish();
+				
+				break;
+
+			default:
+				break;
+		}    	
+    	return super.onOptionsItemSelected(item);
+    }
 
 	/**
 	 * 初始化webview的方法
